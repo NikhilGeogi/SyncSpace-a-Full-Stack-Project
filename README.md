@@ -4,20 +4,6 @@ SyncSpace is a Notion-inspired course project built to practice full-stack web d
 
 The backend is powered by Spring Boot. The user interface is built with Thymeleaf, HTML, CSS, and vanilla JavaScript. User accounts, pages, content blocks, and page shares are stored in MySQL through Spring Data JPA, Hibernate, JdbcTemplate, and Flyway.
 
-## Screenshots
-
-### Feature Overview — Light Mode
-
-![SyncSpace feature overview in light mode](docs/images/demo-light.png)
-
-### REST API Documentation — Dark Mode
-
-![SyncSpace REST API documentation in dark mode](docs/images/api-dark.png)
-
-### Database Structure — Light Mode
-
-![SyncSpace database structure in light mode](docs/images/sql-light.png)
-
 ## Features
 
 ### User Accounts
