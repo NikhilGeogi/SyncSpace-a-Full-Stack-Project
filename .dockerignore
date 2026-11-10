@@ -1,0 +1,26 @@
+# target/ 內含約 59 MB 的舊 fat jar，不排除的話每次 build 都會送進 daemon
+target/
+.git/
+.gitignore
+.gitattributes
+
+# 建置改用 maven base image 內建的 mvn，不需要 wrapper
+.mvn/
+mvnw
+mvnw.cmd
+
+# 文件與截圖不進 image
+docs/
+*.md
+
+# IDE 設定
+nb-configuration.xml
+nbactions.xml
+.idea/
+.vscode/
+.settings/
+.classpath
+.project
+
+# 密碼由 compose 以環境變數注入，不進 image
+.env

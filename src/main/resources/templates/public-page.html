@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en" th:attr="data-public-token=${publicToken}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Shared page | SyncSpace</title>
+    <link rel="stylesheet" href="/style.css">
+    <style>
+        body { display: block; min-height: 100vh; height: auto; }
+        .public-page { width: min(820px, calc(100% - 40px)); margin: 8vh auto; }
+        .public-brand { color: var(--muted-text); font-size: 13px; margin-bottom: 36px; }
+        .public-page h1 { font-size: clamp(32px, 5vw, 46px); margin-bottom: 28px; }
+        .public-block { margin: 12px 0; line-height: 1.65; white-space: pre-wrap; overflow-wrap: anywhere; }
+        .public-block.block-h1 { font-size: 24px; font-weight: 650; margin-top: 24px; }
+        .public-block.block-todo { display: flex; gap: 10px; align-items: baseline; }
+        .public-block.block-todo.is-checked { color: var(--muted-text); text-decoration: line-through; }
+        .public-due-date { margin-left: auto; color: var(--muted-text); font-size: 12px; }
+        .public-error { padding: 18px; border: 1px solid var(--border-color); border-radius: 8px; color: var(--muted-text); }
+    </style>
+</head>
+<body>
+    <main class="public-page">
+        <div class="public-brand">S&nbsp; SyncSpace · Shared read-only page</div>
+        <div id="public-content" aria-live="polite">Loading shared page…</div>
+    </main>
+    <script>
+        (async () => {
+            const container = document.getElementById('public-content');
+            try {
+                const token = document.documentElement.dataset.publicToken;
+                const response = await fetch(`/api/public/pages/${encodeURIComponent(token)}`);
+                if (!response.ok) throw new Error(`Shared page unavailable (${response.status})`);
+                const page = await response.json();
+                document.title = `${page.title} | SyncSpace`;
+                const heading = document.createElement('h1');
+                heading.textContent = page.title;
+                container.replaceChildren(heading);
+                page.blocks.forEach(block => {
+                    const row = document.createElement(block.blockType === 'h1' ? 'h2' : 'div');
+                    row.className = `public-block block-${block.blockType}`;
+                    if (block.blockType === 'todo') {
+                        const checkbox = document.createElement('span');
+                        checkbox.textContent = block.isChecked ? '☑' : '☐';
+                        row.classList.toggle('is-checked', Boolean(block.isChecked));
+                        row.append(checkbox, document.createTextNode(block.content || ''));
+                        if (block.dueDate) {
+                            const due = document.createElement('small');
+                            due.className = 'public-due-date';
+                            due.textContent = `Due ${block.dueDate}`;
+                            row.appendChild(due);
+                        }
+                    } else {
+                        row.textContent = block.content || '';
+                    }
+                    container.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Unable to render the shared page', error);
+                container.replaceChildren();
+                const message = document.createElement('p');
+                message.className = 'public-error';
+                message.textContent = 'This shared page is unavailable or its link has been revoked.';
+                container.appendChild(message);
+            }
+        })();
+    </script>
+</body>
+</html>

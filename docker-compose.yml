@@ -1,0 +1,46 @@
+services:
+  db:
+    image: mysql:8.0
+    container_name: syncspace-db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:?請先複製 .env.example 成 .env 並設定 DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME:-test}
+      TZ: Asia/Taipei
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    ports:
+      # 刻意用 3307：本機通常已有一台 MySQL 佔著 3306，兩者可並存
+      - "${DB_HOST_PORT:-3307}:3306"
+    volumes:
+      - db-data:/var/lib/mysql
+    healthcheck:
+      # 用 -h 127.0.0.1 走 TCP：MySQL entrypoint 初始化期間只開 unix socket，
+      # 走 TCP 才能正確區分「真的可以連線了」與「還在初始化的暫時 server」。
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p\"$$MYSQL_ROOT_PASSWORD\" --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 30s
+
+  app:
+    build: .
+    container_name: syncspace-app
+    restart: unless-stopped
+    depends_on:
+      db:
+        # 少了這個條件，app 會在 MySQL 就緒前啟動並以 Communications link failure 收場
+        condition: service_healthy
+    environment:
+      DB_HOST: db          # compose 網路內的服務名
+      DB_PORT: "3306"      # 容器對容器走內部埠，與對外的 3307 無關
+      DB_NAME: ${DB_NAME:-test}
+      DB_USERNAME: root
+      DB_PASSWORD: ${DB_PASSWORD}
+      TZ: Asia/Taipei
+    ports:
+      - "${APP_PORT:-8080}:8080"
+
+volumes:
+  db-data:

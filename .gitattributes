@@ -1,0 +1,11 @@
+/mvnw text eol=lf
+*.cmd text eol=crlf
+
+# Keep the Docker files LF on every platform. A CRLF .env.example in
+# particular is dangerous: copied to .env, the trailing \r ends up inside
+# the password value, and the database then rejects a password that looks
+# identical to the one the application is sending.
+/Dockerfile         text eol=lf
+/docker-compose.yml text eol=lf
+/.dockerignore      text eol=lf
+/.env.example       text eol=lf

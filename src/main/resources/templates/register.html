@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script>
+        if (localStorage.getItem('DARK_MODE') === 'true') {
+            document.documentElement.classList.add('dark-mode');
+        }
+    </script>
+    <title>Sync | Sign Up</title>
+    <link rel="icon" href="/favicon.png" type="image/png">
+    <link rel="stylesheet" href="/style.css"> <style>
+        :root {
+            --bg-color: #f7f7f5;
+            --text-color: #37352f;
+            --container-bg: #ffffff;
+            --border-color: #dfdfde;
+            --muted-text: #7c7b77;
+            --input-bg: #ffffff;
+            --primary-color: #2383e2;
+        }
+        html.dark-mode {
+            --bg-color: #191919;
+            --text-color: #d4d4d4;
+            --container-bg: #252525;
+            --border-color: #333333;
+            --muted-text: #999999;
+            --input-bg: #1e1e1e;
+            --primary-color: #2b90f5;
+        }
+        body { justify-content: center; align-items: center; background-color: var(--bg-color); color: var(--text-color); transition: background-color 1s, color 1s; }
+        .auth-container {
+            background: var(--container-bg); padding: 40px; border-radius: 8px; width: 100%; max-width: 360px;
+            box-shadow: rgba(15, 15, 15, 0.05) 0px 0px 0px 1px, rgba(15, 15, 15, 0.1) 0px 3px 6px, rgba(15, 15, 15, 0.2) 0px 9px 24px;
+            display: flex; flex-direction: column; gap: 20px;
+            transition: background-color 1s;
+        }
+        .auth-header { text-align: center; }
+        .auth-header h1 { font-size: 24px; font-weight: 700; margin-bottom: 8px; }
+        .input-group { display: flex; flex-direction: column; gap: 6px; }
+        .input-group label { font-size: 12px; font-weight: 600; color: var(--muted-text); }
+        .input-group input {
+            padding: 10px 12px; border: 1px solid var(--border-color); border-radius: 4px; outline: none;
+            background-color: var(--input-bg); color: var(--text-color);
+            transition: border-color 0.2s, background-color 1s, color 1s;
+        }
+        .input-group input:focus { border-color: var(--primary-color); box-shadow: 0 0 0 2px rgba(35, 131, 226, 0.2); }
+        .btn-auth { background: var(--primary-color); color: white; border: none; padding: 10px; border-radius: 4px; cursor: pointer; margin-top: 10px; transition: filter 0.2s; }
+        .btn-auth:hover { filter: brightness(0.88); }
+        .message-box { font-size: 12px; text-align: center; padding: 8px; border-radius: 4px; display: none; }
+        .msg-error { background: #ffebeb; color: #eb5757; }
+        .msg-success { background: #eaf6ee; color: #27ae60; }
+        html.dark-mode .msg-error { background: #3d1c1c; color: #ff6b6b; }
+        html.dark-mode .msg-success { background: #1a3027; color: #52d68a; }
+        .link-text { font-size: 12px; text-align: center; color: var(--muted-text); }
+        .link-text a { color: var(--primary-color); text-decoration: none; }
+        .dark-mode-toggle-btn {
+            position: absolute; top: 16px; right: 16px;
+            background: none; border: 1px solid var(--border-color); border-radius: 4px;
+            padding: 4px 8px; font-size: 14px; cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .dark-mode-toggle-btn:hover { background-color: var(--border-color); }
+    </style>
+</head>
+<body style="position: relative;">
+    <button class="dark-mode-toggle-btn" id="dark-mode-toggle" onclick="toggleDarkMode()" title="Toggle dark mode">&#x1F319;</button>
+    <div class="auth-container">
+        <div class="auth-header"><h1 data-i18n="register_title">Create an account</h1></div>
+        <div id="msg-box" class="message-box"></div>
+        <form id="register-form">
+            <div class="input-group">
+                <label data-i18n="username_label">Username</label>
+                <input type="text" id="username" required data-i18n="username_placeholder" placeholder="Enter your username">
+            </div>
+            <div class="input-group">
+                <label data-i18n="email_label">Email</label>
+                <input type="text" id="email" required data-i18n="email_placeholder" placeholder="Enter your email">
+            </div>
+            <div class="input-group">
+                <label data-i18n="password_label">Password</label>
+                <input type="password" id="password" required data-i18n="password_placeholder" placeholder="Enter your password">
+            </div>
+            <button type="submit" class="btn-auth" data-i18n="register_btn">Sign Up</button>
+        </form>
+        <div class="link-text"><span data-i18n="has_account">Already have an account?</span> <a href="/login" data-i18n="login_link">Log in here</a></div>
+    </div>
+
+    <script src="/i18n.js"></script>
+    <script>
+        (function() {
+            const isDark = document.documentElement.classList.contains('dark-mode');
+            const btn = document.getElementById('dark-mode-toggle');
+            if (isDark && btn) btn.innerHTML = '&#x2600;&#xFE0F;';
+        })();
+
+        function toggleDarkMode() {
+            const isDark = document.documentElement.classList.toggle('dark-mode');
+            localStorage.setItem('DARK_MODE', isDark);
+            const btn = document.getElementById('dark-mode-toggle');
+            if (btn) btn.innerHTML = isDark ? '&#x2600;&#xFE0F;' : '&#x1F319;';
+        }
+    </script>
+    <script>
+        document.getElementById('register-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('username').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const msgBox = document.getElementById('msg-box');
+
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                msgBox.className = 'message-box msg-error';
+                msgBox.innerText = i18n.t('email_invalid');
+                msgBox.style.display = 'block';
+                return;
+            }
+
+            const response = await fetch('/api/users/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, email, password })
+            });
+
+            if (response.ok) {
+                msgBox.className = 'message-box msg-success';
+                msgBox.innerText = i18n.t('register_success');
+                msgBox.style.display = 'block';
+                setTimeout(() => { window.location.href = '/login'; }, 1500);
+            } else {
+                msgBox.className = 'message-box msg-error';
+                msgBox.innerText = await response.text();
+                msgBox.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>

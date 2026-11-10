@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script>
+        if (localStorage.getItem('DARK_MODE') === 'true') {
+            document.documentElement.classList.add('dark-mode');
+        }
+    </script>
+    <title>Sync | Login</title>
+    <link rel="icon" href="/favicon.png" type="image/png">
+    <style>
+        :root {
+            --bg-color: #f7f7f5;
+            --text-color: #37352f;
+            --container-bg: #ffffff;
+            --border-color: #dfdfde;
+            --muted-text: #7c7b77;
+            --input-bg: #ffffff;
+            --primary-color: #2383e2;
+            --error-bg: #ffebeb;
+            --error-color: #eb5757;
+        }
+        html.dark-mode {
+            --bg-color: #191919;
+            --text-color: #d4d4d4;
+            --container-bg: #252525;
+            --border-color: #333333;
+            --muted-text: #999999;
+            --input-bg: #1e1e1e;
+            --primary-color: #2b90f5;
+            --error-bg: #3d1c1c;
+            --error-color: #ff6b6b;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body {
+            display: flex; height: 100vh;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            justify-content: center; align-items: center;
+            transition: background-color 1s, color 1s;
+        }
+        .login-container {
+            background: var(--container-bg);
+            padding: 40px; border-radius: 8px; width: 100%; max-width: 360px;
+            box-shadow: rgba(15, 15, 15, 0.05) 0px 0px 0px 1px, rgba(15, 15, 15, 0.1) 0px 3px 6px, rgba(15, 15, 15, 0.2) 0px 9px 24px;
+            display: flex; flex-direction: column; gap: 20px;
+            transition: background-color 1s;
+        }
+        .login-header { text-align: center; }
+        .login-header h1 { font-size: 24px; font-weight: 700; margin-bottom: 8px; }
+        .login-header p { font-size: 14px; color: var(--muted-text); }
+        .input-group { display: flex; flex-direction: column; gap: 6px; }
+        .input-group label { font-size: 12px; font-weight: 600; color: var(--muted-text); }
+        .input-group input {
+            padding: 10px 12px; border: 1px solid var(--border-color); border-radius: 4px;
+            outline: none; font-size: 14px; transition: border-color 0.2s, background-color 1s, color 1s;
+            background-color: var(--input-bg); color: var(--text-color);
+        }
+        .input-group input:focus { border-color: var(--primary-color); box-shadow: 0 0 0 2px rgba(35, 131, 226, 0.2); }
+        .btn-login {
+            background: var(--primary-color); color: white; border: none; padding: 10px;
+            border-radius: 4px; font-size: 14px; font-weight: 500; cursor: pointer;
+            transition: background 0.2s; margin-top: 10px;
+        }
+        .btn-login:hover { filter: brightness(0.88); }
+        .error-msg {
+            color: var(--error-color); font-size: 12px; text-align: center; display: none;
+            background: var(--error-bg); padding: 8px; border-radius: 4px;
+        }
+        .link-text { font-size: 12px; text-align: center; color: var(--muted-text); margin-top: 10px; }
+        .link-text a { color: var(--primary-color); text-decoration: none; }
+        .link-text a:hover { text-decoration: underline; }
+        .dark-mode-toggle-btn {
+            position: absolute; top: 16px; right: 16px;
+            background: none; border: 1px solid var(--border-color); border-radius: 4px;
+            padding: 4px 8px; font-size: 14px; cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .dark-mode-toggle-btn:hover { background-color: var(--border-color); }
+    </style>
+</head>
+<body style="position: relative;">
+    <button class="dark-mode-toggle-btn" id="dark-mode-toggle" onclick="toggleDarkMode()" title="Toggle dark mode">&#x1F319;</button>
+
+    <div class="login-container">
+        <div class="login-header">
+            <h1 data-i18n="login_title">Login</h1>
+            <p data-i18n="login_subtitle">Welcome back to your workspace</p>
+        </div>
+        <div id="error-msg" class="error-msg" data-i18n="login_error_empty">Invalid email or password. Please try again.</div>
+        <form id="login-form">
+            <div class="input-group">
+                <label for="email" data-i18n="email_label">Email</label>
+                <input type="text" id="email" placeholder="Enter your email" required data-i18n="email_placeholder">
+            </div>
+            <div class="input-group">
+                <label for="password" data-i18n="password_label">Password</label>
+                <input type="password" id="password" placeholder="Enter your password" required data-i18n="password_placeholder">
+            </div>
+            <button type="submit" class="btn-login" data-i18n="continue_btn">Continue</button>
+            <div class="link-text"><span data-i18n="no_account">Don't have an account?</span> <a href="/register" data-i18n="signup_link">Sign up here</a></div>
+        </form>
+    </div>
+
+    <script src="/i18n.js"></script>
+    <script>
+        // Sync button icon with current state
+        (function() {
+            const isDark = document.documentElement.classList.contains('dark-mode');
+            const btn = document.getElementById('dark-mode-toggle');
+            if (isDark && btn) btn.innerHTML = '&#x2600;&#xFE0F;';
+        })();
+
+        function toggleDarkMode() {
+            const isDark = document.documentElement.classList.toggle('dark-mode');
+            localStorage.setItem('DARK_MODE', isDark);
+            const btn = document.getElementById('dark-mode-toggle');
+            if (btn) btn.innerHTML = isDark ? '&#x2600;&#xFE0F;' : '&#x1F319;';
+        }
+    </script>
+    <script>
+        document.getElementById('login-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const errorMsg = document.getElementById('error-msg');
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                errorMsg.innerText = 'Please enter a valid email address (e.g. user@example.com).';
+                errorMsg.style.display = 'block';
+                return;
+            }
+            try {
+                const response = await fetch('/api/users/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: email, password: password })
+                });
+                if (response.ok) {
+                    window.location.href = '/';
+                } else {
+                    errorMsg.style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Login request failed', error);
+                errorMsg.innerText = i18n.t('login_error_server');
+                errorMsg.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>
